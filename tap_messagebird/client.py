@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any, Dict, Iterable, Optional
-from urllib.parse import urlparse, parse_qsl
+from urllib.parse import parse_qsl, urlparse
 
 import requests
-from singer_sdk.pagination import BaseHATEOASPaginator, BaseOffsetPaginator
 from singer_sdk.helpers.jsonpath import extract_jsonpath
+from singer_sdk.pagination import BaseHATEOASPaginator, BaseOffsetPaginator
 from singer_sdk.streams import RESTStream
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
@@ -18,12 +18,13 @@ class MessagebirdHATEOASPaginator(BaseHATEOASPaginator):
     def get_next_url(self, response):
         return response.json()["links"]["next"]
 
-class MessagebirdOffsetPaginator(BaseOffsetPaginator):
-    def get_next(self, response)->int|None:
-        response_json = response.json()
-        return response_json["offset"]+response_json["limit"]
 
-    def has_more(self, response)->bool:
+class MessagebirdOffsetPaginator(BaseOffsetPaginator):
+    def get_next(self, response) -> int | None:
+        response_json = response.json()
+        return response_json["offset"] + response_json["limit"]
+
+    def has_more(self, response) -> bool:
         response_json = response.json()
         offset = response_json["offset"]
         count = response_json["count"]
@@ -80,7 +81,6 @@ class MessagebirdStream(RESTStream):
         """Parse the response and return an iterator of result records."""
         # TODO: Parse response body and return a set of records.
         yield from extract_jsonpath(self.records_jsonpath, input=response.json())
-
 
     def response_error_message(self, response: requests.Response) -> str:
         """Build error message for invalid http statuses.
