@@ -7,8 +7,10 @@ from tap_messagebird.client import MessagebirdOffsetPaginator, MessagebirdStream
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
+
 class MessagebirdConversations(MessagebirdStream):
     url_base = "https://conversations.messagebird.com/v1"
+
     def limit(self):
         return 20
 
@@ -41,12 +43,12 @@ class ConversationsStream(MessagebirdConversations):
     # Optionally, you may also use `schema_filepath` in place of `schema`:
     schema_filepath = SCHEMAS_DIR / "conversation.json"
 
-
     def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
         """Return a context dictionary for child streams."""
         return {
             "_sdc_conversations_id": record["id"],
         }
+
 
 class ConversationMessagesStream(MessagebirdConversations):
     """Conversation Messages stream. Messages stream doesn't pull all messages as we were expecting"""
@@ -71,8 +73,6 @@ class ConversationMessagesStream(MessagebirdConversations):
         return params
 
 
-
-
 class MessagesStream(MessagebirdStream):
     """Messages stream."""
 
@@ -93,4 +93,3 @@ class MessagesStream(MessagebirdStream):
         if params.get("from") is None:
             params["from"] = self.config["start_date"]
         return params
-
