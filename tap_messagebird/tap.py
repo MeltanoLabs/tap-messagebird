@@ -6,11 +6,16 @@ import pendulum
 from singer_sdk import Stream, Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
 
-from tap_messagebird.streams import ConversationsStream, MessagesStream
+from tap_messagebird.streams import (
+    ConversationMessagesStream,
+    ConversationsStream,
+    MessagesStream,
+)
 
 STREAM_TYPES = [
     ConversationsStream,
     MessagesStream,
+    ConversationMessagesStream,
 ]
 
 
