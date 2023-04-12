@@ -43,10 +43,10 @@ class ConversationsStream(MessagebirdConversations):
     # Optionally, you may also use `schema_filepath` in place of `schema`:
     schema_filepath = SCHEMAS_DIR / "conversation.json"
 
-    def get_child_context(self, record: dict, context: Optional[dict]) -> dict | None:
+    def get_child_context(self, record: dict, context: Optional[dict]) -> Optional[dict]:
         """Return a context dictionary for child streams."""
         if record["status"] == "archived":
-            return
+            return None
 
         return {
             "_sdc_conversations_id": record["id"],
