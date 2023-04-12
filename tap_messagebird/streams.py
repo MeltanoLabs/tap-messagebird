@@ -1,7 +1,9 @@
 """Stream type classes for tap-messagebird."""
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 from tap_messagebird.client import MessagebirdOffsetPaginator, MessagebirdStream
 
@@ -26,9 +28,9 @@ class MessagebirdConversations(MessagebirdStream):
 
     def get_url_params(
         self,
-        context: Optional[dict],  # noqa: ARG002
-        next_page_token: Optional[Any],
-    ) -> Dict[str, Any]:
+        context: dict | None,  # noqa: ARG002
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
         Overrode as we have a different paginator for this api.
@@ -54,8 +56,8 @@ class ConversationsStream(MessagebirdConversations):
     def get_child_context(
         self,
         record: dict,
-        context: Optional[dict],  # noqa: ARG002
-    ) -> Optional[dict]:
+        context: dict | None,  # noqa: ARG002
+    ) -> dict | None:
         """Return a context dictionary for child streams."""
         if record["status"] == "archived":
             return None
@@ -81,9 +83,9 @@ class ConversationMessagesStream(MessagebirdConversations):
 
     def get_url_params(
         self,
-        context: Optional[dict],
-        next_page_token: Optional[Any],
-    ) -> Dict[str, Any]:
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization."""
         params = super().get_url_params(
             context=context,
@@ -106,9 +108,9 @@ class MessagesStream(MessagebirdStream):
 
     def get_url_params(
         self,
-        context: Optional[dict],
-        next_page_token: Optional[Any],
-    ) -> Dict[str, Any]:
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization."""
         params = super().get_url_params(
             context=context,
