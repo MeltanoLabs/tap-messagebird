@@ -9,21 +9,29 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
 class MessagebirdConversations(MessagebirdStream):
+    """Messagebird Conversations stream class."""
+
     url_base = "https://conversations.messagebird.com/v1"
 
-    def limit(self):
+    def limit(self) -> int:
+        """Return the page size for this stream."""
         return 20
 
-    def get_new_paginator(self):
+    def get_new_paginator(self) -> MessagebirdOffsetPaginator:
+        """Return a new instance of a paginator for this stream."""
         return MessagebirdOffsetPaginator(
-            start_value=0, page_size=self.limit()
-        )  # type: ignore
+            start_value=0,
+            page_size=self.limit(),
+        )
 
     def get_url_params(
-        self, context: Optional[dict], next_page_token: Optional[Any]
+        self,
+        context: Optional[dict],  # noqa: ARG002
+        next_page_token: Optional[Any],
     ) -> Dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization.
-        Overrode as we have a different paginator for this api
+
+        Overrode as we have a different paginator for this api.
         """
         params = {}
         if next_page_token:
@@ -46,7 +54,7 @@ class ConversationsStream(MessagebirdConversations):
     def get_child_context(
         self,
         record: dict,
-        context: Optional[dict],
+        context: Optional[dict],  # noqa: ARG002
     ) -> Optional[dict]:
         """Return a context dictionary for child streams."""
         if record["status"] == "archived":
@@ -58,7 +66,10 @@ class ConversationsStream(MessagebirdConversations):
 
 
 class ConversationMessagesStream(MessagebirdConversations):
-    """Conversation Messages stream. Messages stream doesn't pull all messages as we were expecting"""
+    """Conversation Messages stream.
+
+    Messages stream doesn't pull all messages.
+    """
 
     name = "conversation_message"
     path = "/conversations/{_sdc_conversations_id}/messages"
@@ -69,11 +80,14 @@ class ConversationMessagesStream(MessagebirdConversations):
     parent_stream_type = ConversationsStream
 
     def get_url_params(
-        self, context: Optional[dict], next_page_token: Optional[Any]
+        self,
+        context: Optional[dict],
+        next_page_token: Optional[Any],
     ) -> Dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization."""
         params = super().get_url_params(
-            context=context, next_page_token=next_page_token
+            context=context,
+            next_page_token=next_page_token,
         )
         if params.get("from") is None:
             params["from"] = self.config["start_date"]
@@ -91,11 +105,14 @@ class MessagesStream(MessagebirdStream):
     schema_filepath = SCHEMAS_DIR / "message.json"
 
     def get_url_params(
-        self, context: Optional[dict], next_page_token: Optional[Any]
+        self,
+        context: Optional[dict],
+        next_page_token: Optional[Any],
     ) -> Dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization."""
         params = super().get_url_params(
-            context=context, next_page_token=next_page_token
+            context=context,
+            next_page_token=next_page_token,
         )
         if params.get("from") is None:
             params["from"] = self.config["start_date"]

@@ -3,7 +3,7 @@ name = "tap-messagebird"
 version = "0.0.0"
 description = "`tap-messagebird` is a Singer tap for Messagebird, built with the Meltano Singer SDK."
 readme = "README.md"
-authors = ["Meltano"]
+authors = ["Meltano Team <hello@meltano.com>"]
 keywords = [
     "ELT",
     "Messagebird",
@@ -18,13 +18,6 @@ fs-s3fs = { version = "^1.1.1", optional = true}
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
-tox = "^3.24.4"
-flake8 = "^3.9.2"
-black = "^22.10.0"
-pydocstyle = "^6.1.1"
-mypy = "^0.910"
-types-requests = "^2.26.1"
-isort = "^5.10.1"
 
 [tool.poetry.extras]
 s3 = ["fs-s3fs"]
@@ -46,3 +39,15 @@ tap-messagebird = 'tap_messagebird.tap:TapMessagebird.cli'
 enable = true
 vcs = "git"
 style = "semver"
+
+[tool.ruff]
+ignore = ["ANN101"]
+select = ["ALL"]
+target-version = "py37"
+
+[tool.ruff.per-file-ignores]
+"scripts/*" = ["ANN", "D", "INP"]
+"tests/*" = ["ANN"]
+
+[tool.ruff.pydocstyle]
+convention = "google"
