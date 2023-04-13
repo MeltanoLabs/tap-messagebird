@@ -1,6 +1,6 @@
 """Messagebird tap class."""
 
-from typing import List
+from __future__ import annotations
 
 import pendulum
 from singer_sdk import Stream, Tap
@@ -47,7 +47,7 @@ class TapMessagebird(Tap):
         ),
     ).to_dict()
 
-    def discover_streams(self) -> List[Stream]:
+    def discover_streams(self) -> list[Stream]:
         """Return a list of discovered streams."""
         return [stream_class(tap=self) for stream_class in STREAM_TYPES]
 

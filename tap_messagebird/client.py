@@ -2,29 +2,39 @@
 
 from __future__ import annotations
 
+from http import HTTPStatus
 from pathlib import Path
-from typing import Any, Dict, Iterable, Optional
+from typing import TYPE_CHECKING, Any, Iterable
 from urllib.parse import parse_qsl, urlparse
 
-import requests
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.pagination import BaseHATEOASPaginator, BaseOffsetPaginator
 from singer_sdk.streams import RESTStream
+
+if TYPE_CHECKING:
+    import requests
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
 class MessagebirdHATEOASPaginator(BaseHATEOASPaginator):
-    def get_next_url(self, response):
+    """Messagebird HATEOAS paginator class."""
+
+    def get_next_url(self, response: requests.Response) -> str:
+        """Return the next URL to use for pagination."""
         return response.json()["links"]["next"]
 
 
 class MessagebirdOffsetPaginator(BaseOffsetPaginator):
-    def get_next(self, response) -> int | None:
+    """Messagebird offset-based paginator class."""
+
+    def get_next(self, response: requests.Response) -> int | None:
+        """Return the next offset to use for pagination."""
         response_json = response.json()
         return response_json["offset"] + response_json["limit"]
 
-    def has_more(self, response) -> bool:
+    def has_more(self, response: requests.Response) -> bool:
+        """Return True if there are more pages to paginate, False otherwise."""
         response_json = response.json()
         offset = response_json["offset"]
         count = response_json["count"]
@@ -38,10 +48,11 @@ class MessagebirdStream(RESTStream):
     url_base = "https://rest.messagebird.com"
 
     records_jsonpath = "$.items[*]"
-    next_page_token_jsonpath = "$.next_page"  # Or override `get_next_page_token`.
+    next_page_token_jsonpath = "$.next_page"  # noqa: S105
     _LOG_REQUEST_METRIC_URLS: bool = True
 
-    def get_new_paginator(self):
+    def get_new_paginator(self) -> MessagebirdHATEOASPaginator:
+        """Return a new instance of a paginator for this stream."""
         return MessagebirdHATEOASPaginator()
 
     @property
@@ -54,8 +65,10 @@ class MessagebirdStream(RESTStream):
         return headers
 
     def get_url_params(
-        self, context: Optional[dict], next_page_token: Optional[Any]
-    ) -> Dict[str, Any]:
+        self,
+        context: dict | None,  # noqa: ARG002
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization."""
         params: dict = {}
         if next_page_token:
@@ -82,7 +95,11 @@ class MessagebirdStream(RESTStream):
         """
         full_path = urlparse(response.url).path or self.path
         error_content = ""
-        if 400 <= response.status_code < 500:
+        if (
+            HTTPStatus.BAD_REQUEST
+            <= response.status_code
+            < HTTPStatus.INTERNAL_SERVER_ERROR
+        ):
             error_type = "Client"
             error_content = response.json()
         else:
