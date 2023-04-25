@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any, Iterable
 
 from tap_messagebird.client import MessagebirdOffsetPaginator, MessagebirdStream
+
+if TYPE_CHECKING:
+    import requests
+
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
@@ -95,6 +99,41 @@ class ConversationMessagesStream(MessagebirdConversations):
             params["from"] = self.config["start_date"]
         return params
 
+    def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
+        """Return a generator of record-type dictionary objects.
+
+        Each record emitted should be a dictionary of property names to their values.
+
+        Args:
+            context: Stream partition or context dictionary.
+
+        Yields:
+            One item per (possibly processed) record in the API.
+        """
+        try:
+            yield from super().get_records(context)
+        except ConversationArchivedWarning:
+            self.logger.warning("Conversation is archived, skipping", exc_info=True)
+
+    def validate_response(self, response: requests.Response) -> None:
+        """Deal with conversations being archived.
+
+        If a conversation is archived before we pull the message we
+        sometimes get a 410. We don't want to fail the sync for this,
+        so we catch it and log it.
+        """
+        if response.status_code == 410:
+            msg = (
+                f"{response.status_code} Client Error: "
+                f"{response.reason} for url: {response.url}"
+            )
+            response_json: dict = response.json()
+            error: dict = response_json["error"]
+            if response.status_code == 410 and error[0]["code"] == 21:
+                errmsg = f"{msg} {error=}"
+                raise ConversationArchivedWarning(errmsg)
+        super().validate_response(response)
+
 
 class MessagesStream(MessagebirdStream):
     """Messages stream."""
@@ -119,3 +158,7 @@ class MessagesStream(MessagebirdStream):
         if params.get("from") is None:
             params["from"] = self.config["start_date"]
         return params
+
+
+class ConversationArchivedWarning(Exception):
+    """Conversation is archived and we recieved an error."""
