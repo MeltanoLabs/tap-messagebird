@@ -10,6 +10,7 @@ from tap_messagebird.client import MessagebirdOffsetPaginator, MessagebirdStream
 if TYPE_CHECKING:
     import requests
 
+
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
@@ -116,9 +117,9 @@ class ConversationMessagesStream(MessagebirdConversations):
 
     def validate_response(self, response: requests.Response) -> None:
         """Deal with conversations being archived.
-        
-        If a conversation is archived before we pull the message we 
-        sometimes get a 410. We don't want to fail the sync for this, 
+
+        If a conversation is archived before we pull the message we
+        sometimes get a 410. We don't want to fail the sync for this,
         so we catch it and log it.
         """
         if response.status_code == 410:
