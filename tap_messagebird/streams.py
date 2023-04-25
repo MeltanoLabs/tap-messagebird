@@ -113,7 +113,7 @@ class ConversationMessagesStream(MessagebirdConversations):
         try:
             yield from super().get_records(context)
         except ConversationArchivedWarning as e:
-            self.logger.warning(f"Conversation is archived, skipping. {e=}")
+            self.logger.warning("Conversation is archived, skipping", exc_info=True)
 
     def validate_response(self, response: requests.Response) -> None:
         """Deal with conversations being archived.
