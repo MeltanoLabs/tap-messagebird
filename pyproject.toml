@@ -41,7 +41,7 @@ vcs = "git"
 style = "semver"
 
 [tool.ruff]
-ignore = ["ANN101", "G004", "PLR2004", "N818"]
+ignore = ["ANN101", "PLR2004", "N818"]
 select = ["ALL"]
 target-version = "py37"
 
