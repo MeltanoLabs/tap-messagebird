@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from tap_messagebird.client import MessagebirdOffsetPaginator, MessagebirdStream
+import requests
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
@@ -108,13 +109,15 @@ class ConversationMessagesStream(MessagebirdConversations):
         """
         try:
             yield from super().get_records(context)
-        except ConversationArchivedFailure as e:
+        except ConversationArchivedWarning as e:
             self.logger.warning(f"Conversation is archived, skipping. {e=}")
 
-    def validate_response(self, response) -> None:
-        """If a conversation is archived before we pull the message we sometimes get a 410.
-
-        We don't want to fail the sync for this, so we catch it and log it.
+    def validate_response(self, response: requests.Response) -> None:
+        """Deal with conversations being archived
+        
+        If a conversation is archived before we pull the message we 
+        sometimes get a 410. We don't want to fail the sync for this, 
+        so we catch it and log it.
         """
         if response.status_code == 410:
             msg = (
@@ -124,7 +127,7 @@ class ConversationMessagesStream(MessagebirdConversations):
             response_json: dict = response.json()
             error: dict = response_json["error"]
             if response.status_code == 410 and error[0]["code"] == 21:
-                raise ConversationArchivedFailure(msg + f" {error=}")
+                raise ConversationArchivedWarning(msg + f" {error=}")
         super().validate_response(response)
 
 
