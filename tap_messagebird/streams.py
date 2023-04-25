@@ -94,8 +94,8 @@ class ConversationMessagesStream(MessagebirdConversations):
         if params.get("from") is None:
             params["from"] = self.config["start_date"]
         return params
-    
-    def get_records(self, context: dict | None): 
+
+    def get_records(self, context: dict | None):
         """Return a generator of record-type dictionary objects.
 
         Each record emitted should be a dictionary of property names to their values.
@@ -110,7 +110,7 @@ class ConversationMessagesStream(MessagebirdConversations):
             super().get_records(context)
         except ConversationArchivedFailure as e:
             self.logger.warning(f"Conversation is archived, skipping. {e=}")
-    
+
     def validate_response(self, response):
         if response.status_code == 410:
             msg = (
@@ -150,6 +150,4 @@ class MessagesStream(MessagebirdStream):
 
 
 class ConversationArchivedFailure(Exception):
-    """
-    Conversation is archived and it threw in error
-    """
+    """Conversation is archived and it threw in error."""
