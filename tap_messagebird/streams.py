@@ -130,7 +130,8 @@ class ConversationMessagesStream(MessagebirdConversations):
             response_json: dict = response.json()
             error: dict = response_json["error"]
             if response.status_code == 410 and error[0]["code"] == 21:
-                raise ConversationArchivedWarning(msg + f" {error=}")
+                errmsg = f"{msg} {error=}"
+                raise ConversationArchivedWarning(errmsg)
         super().validate_response(response)
 
 
