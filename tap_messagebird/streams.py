@@ -107,7 +107,7 @@ class ConversationMessagesStream(MessagebirdConversations):
             One item per (possibly processed) record in the API.
         """
         try:
-            super().get_records(context)
+            yield from super().get_records(context)
         except ConversationArchivedFailure as e:
             self.logger.warning(f"Conversation is archived, skipping. {e=}")
     
