@@ -160,4 +160,4 @@ class MessagesStream(MessagebirdStream):
 
 
 class ConversationArchivedWarning(Exception):
-    """Conversation is archived and it threw in error."""
+    """Conversation is archived and we recieved an error."""
