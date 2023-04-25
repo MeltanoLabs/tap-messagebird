@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Iterable
+from typing import TYPE_CHECKING, Any, Iterable
 
 from tap_messagebird.client import MessagebirdOffsetPaginator, MessagebirdStream
-import requests
+
+if TYPE_CHECKING:
+    import requests
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
@@ -113,7 +115,7 @@ class ConversationMessagesStream(MessagebirdConversations):
             self.logger.warning(f"Conversation is archived, skipping. {e=}")
 
     def validate_response(self, response: requests.Response) -> None:
-        """Deal with conversations being archived
+        """Deal with conversations being archived.
         
         If a conversation is archived before we pull the message we 
         sometimes get a 410. We don't want to fail the sync for this, 
