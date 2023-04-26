@@ -28,22 +28,6 @@ def test_standard_tap_tests():
 @responses.activate
 def test_missing_conversation():
     """Sometimes conversations are missing."""
-    responses.post(
-        "https://conversations.messagebird.com/v1/conversations?status=all&limit=20",
-        json={
-            "offset": 0,
-            "limit": 20,
-            "count": 20,
-            "totalCount": 1,
-            "items": [
-                {
-                    "id": "cde04309170a4544bc68085d05becd65",
-                    "status": "active",
-                },
-            ],
-        },
-        status=200,
-    )
     responses.get(
         "https://conversations.messagebird.com/v1/conversations/123456/messages",
         json={
