@@ -51,4 +51,3 @@ def test_missing_conversation():
     ]
     context = {"_sdc_conversations_id": "123456"}
     conversation_message_stream.sync(context)
-    conversation_message_stream.sync(context)
