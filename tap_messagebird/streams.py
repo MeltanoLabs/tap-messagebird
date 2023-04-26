@@ -128,9 +128,9 @@ class ConversationMessagesStream(MessagebirdConversations):
                 f"{response.reason} for url: {response.url}"
             )
             response_json: dict = response.json()
-            error: dict = response_json["error"]
-            if response.status_code == 410 and error[0]["code"] == 21:
-                errmsg = f"{msg} {error=}"
+            errors: dict = response_json["errors"]
+            if response.status_code == 410 and errors[0]["code"] == 21:
+                errmsg = f"{msg} {errors=}"
                 raise ConversationArchivedWarning(errmsg)
         super().validate_response(response)
 
