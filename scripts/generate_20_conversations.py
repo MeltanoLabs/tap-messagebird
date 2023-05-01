@@ -5,7 +5,7 @@ import dotenv
 import requests
 
 if not (dotenv.load_dotenv()):
-    raise Exception("Need dotenv to load auth key")  # noqa: EM101, TRY002, TRY003
+    raise Exception("Need dotenv to load auth key")  # noqa: TRY002, TRY003
 
 
 def start_conversation_then_archive_it(
