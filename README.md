@@ -7,6 +7,7 @@ Built with the [Meltano Singer SDK](https://sdk.meltano.com).
 ## Capabilities
 
 * `catalog`
+# `state`
 * `discover`
 * `about`
 * `stream-maps`
