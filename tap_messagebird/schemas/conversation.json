@@ -43,13 +43,15 @@
                     }
                 },
                 "createdDatetime": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time"
                 },
                 "updatedDatetime": {
                     "type": [
                         "null",
                         "string"
-                    ]
+                    ],
+                    "format": "date-time"
                 }
             }
         },
@@ -71,10 +73,12 @@
                         "type": "string"
                     },
                     "createdDatetime": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "date-time"
                     },
                     "updatedDatetime": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "date-time"
                     }
                 }
             }
@@ -83,13 +87,16 @@
             "type": "string"
         },
         "createdDatetime": {
-            "type": "string"
+            "type": "string",
+            "format": "date-time"
         },
         "updatedDatetime": {
-            "type": "string"
+            "type": "string",
+            "format": "date-time"
         },
         "lastReceivedDatetime": {
-            "type": "string"
+            "type": "string",
+            "format": "date-time"
         },
         "lastUsedChannelId": {
             "type": "string"

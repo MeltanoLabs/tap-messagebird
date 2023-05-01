@@ -14,10 +14,13 @@ plugins:
     - discover
     - about
     - stream-maps
+    - state
     settings:
     - name: api_key
       kind: password
     - name: start_date
+    config:
+      start_date: "2023-04-30"
   loaders:
   - name: target-jsonl
     variant: andyh1203

@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterable
+from typing import TYPE_CHECKING, Any, Iterable, cast
+
+import pendulum
 
 from tap_messagebird.client import MessagebirdOffsetPaginator, MessagebirdStream
 
@@ -53,7 +55,7 @@ class ConversationsStream(MessagebirdConversations):
     name = "conversation"
     path = "/conversations"
     primary_keys = ["id"]
-    replication_key = None
+    replication_key = "lastReceivedDatetime"
     # Optionally, you may also use `schema_filepath` in place of `schema`:
     schema_filepath = SCHEMAS_DIR / "conversation.json"
 
@@ -70,11 +72,52 @@ class ConversationsStream(MessagebirdConversations):
             "_sdc_conversations_id": record["id"],
         }
 
+    def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
+        """Return a generator of record-type dictionary objects.
+
+        Each record emitted should be a dictionary of property names to their values.
+
+        Args:
+            context: Stream partition or context dictionary.
+
+        Yields:
+            One item per (possibly processed) record in the API.
+        """
+        starting_replication_key_value = self.get_starting_timestamp(context)
+        if starting_replication_key_value is None:
+            # Shouldn't be possible, but mypy complains
+            raise ValueError(  # noqa: TRY003
+                "No starting replication key value found.",
+            )
+        starting_replication_key_value = pendulum.instance(
+            starting_replication_key_value,
+        )
+
+        for record in self.request_records(context):
+            transformed_record = self.post_process(record, context)
+            if transformed_record is None:
+                # Record filtered out during post_process()
+                continue
+            record_last_received_datetime: pendulum.DateTime = cast(
+                pendulum.DateTime,
+                pendulum.parse(record[self.replication_key]),
+            )
+            # Conversations are returned in descending order, so we can stop
+            # There's no filtering paramater just this default ordering
+            if record_last_received_datetime < starting_replication_key_value:
+                self.logger.info(
+                    f"Hit a record with a {str(record_last_received_datetime)=}"
+                    f"< {str(starting_replication_key_value)=}. Stopping.",
+                )
+                break
+            yield transformed_record
+
 
 class ConversationMessagesStream(MessagebirdConversations):
     """Conversation Messages stream.
 
-    Messages stream doesn't pull all messages.
+    This stream pulls WhatsApp messages, while the messages stream
+    doesn't seem to pull them.
     """
 
     name = "conversation_message"
@@ -84,20 +127,8 @@ class ConversationMessagesStream(MessagebirdConversations):
     # Optionally, you may also use `schema_filepath` in place of `schema`:
     schema_filepath = SCHEMAS_DIR / "conversation_message.json"
     parent_stream_type = ConversationsStream
-
-    def get_url_params(
-        self,
-        context: dict | None,
-        next_page_token: Any | None,
-    ) -> dict[str, Any]:
-        """Return a dictionary of values to be used in URL parameterization."""
-        params = super().get_url_params(
-            context=context,
-            next_page_token=next_page_token,
-        )
-        if params.get("from") is None:
-            params["from"] = self.config["start_date"]
-        return params
+    # We don't need to track state per conversation
+    state_partitioning_keys: list[str] = []
 
     def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
         """Return a generator of record-type dictionary objects.
@@ -156,9 +187,12 @@ class MessagesStream(MessagebirdStream):
             next_page_token=next_page_token,
         )
         if params.get("from") is None:
-            params["from"] = self.config["start_date"]
+            from_date = pendulum.parse(self.config["start_date"]).to_iso8601_string()
+            params["from"] = from_date
         return params
 
 
 class ConversationArchivedWarning(Exception):
+    """Conversation is archived and we recieved an error."""
+
     """Conversation is archived and we recieved an error."""
