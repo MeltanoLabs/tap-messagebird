@@ -106,8 +106,9 @@ class ConversationsStream(MessagebirdConversations):
             # There's no filtering paramater just this default ordering
             if record_last_received_datetime < starting_replication_key_value:
                 self.logger.info(
-                    f"Hit a record with a {str(record_last_received_datetime)=}"
-                    f"< {str(starting_replication_key_value)=}. Stopping.",
+                    "Breaking after hitting a record with replication key %s < %s",
+                    record_last_received_datetime,
+                    starting_replication_key_value,
                 )
                 break
             yield transformed_record
