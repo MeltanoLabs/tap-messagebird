@@ -54,7 +54,7 @@ class ConversationsStream(MessagebirdConversations):
 
     name = "conversation"
     path = "/conversations"
-    primary_keys = ["id"]
+    primary_keys = ["id"]  # noqa: RUF012
     replication_key = "lastReceivedDatetime"
     # Optionally, you may also use `schema_filepath` in place of `schema`:
     schema_filepath = SCHEMAS_DIR / "conversation.json"
@@ -123,13 +123,13 @@ class ConversationMessagesStream(MessagebirdConversations):
 
     name = "conversation_message"
     path = "/conversations/{_sdc_conversations_id}/messages"
-    primary_keys = ["id"]
+    primary_keys = ["id"]  # noqa: RUF012
     replication_key = None
     # Optionally, you may also use `schema_filepath` in place of `schema`:
     schema_filepath = SCHEMAS_DIR / "conversation_message.json"
     parent_stream_type = ConversationsStream
     # We don't need to track state per conversation
-    state_partitioning_keys: list[str] = []
+    state_partitioning_keys: list[str] = []  # noqa: RUF012
 
     def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
         """Return a generator of record-type dictionary objects.
@@ -172,7 +172,7 @@ class MessagesStream(MessagebirdStream):
 
     name = "message"
     path = "/messages"
-    primary_keys = ["id"]
+    primary_keys = ["id"]  # noqa: RUF012
     replication_key = None
     # Optionally, you may also use `schema_filepath` in place of `schema`:
     schema_filepath = SCHEMAS_DIR / "message.json"
