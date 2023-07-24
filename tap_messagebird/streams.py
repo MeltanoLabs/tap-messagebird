@@ -10,6 +10,8 @@ import pendulum
 from tap_messagebird.client import MessagebirdOffsetPaginator, MessagebirdStream
 
 if TYPE_CHECKING:
+    from urllib.parse import ParseResult
+
     import requests
 
 
@@ -35,13 +37,13 @@ class MessagebirdConversations(MessagebirdStream):
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
-        next_page_token: Any | None,
+        next_page_token: int | None,  # type: ignore[override]
     ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
         Overrode as we have a different paginator for this api.
         """
-        params = {}
+        params: dict[str, Any] = {}
         if next_page_token:
             params["offset"] = next_page_token
         params["status"] = "all"
@@ -180,7 +182,7 @@ class MessagesStream(MessagebirdStream):
     def get_url_params(
         self,
         context: dict | None,
-        next_page_token: Any | None,
+        next_page_token: ParseResult | None,
     ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization."""
         params = super().get_url_params(

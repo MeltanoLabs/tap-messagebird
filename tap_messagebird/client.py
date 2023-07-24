@@ -12,6 +12,8 @@ from singer_sdk.pagination import BaseHATEOASPaginator, BaseOffsetPaginator
 from singer_sdk.streams import RESTStream
 
 if TYPE_CHECKING:
+    from urllib.parse import ParseResult
+
     import requests
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
@@ -67,7 +69,7 @@ class MessagebirdStream(RESTStream):
     def get_url_params(
         self,
         context: dict | None,  # noqa: ARG002
-        next_page_token: Any | None,
+        next_page_token: ParseResult | None,
     ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization."""
         params: dict = {}
