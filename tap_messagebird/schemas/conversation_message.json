@@ -2,7 +2,7 @@
     "type": "object",
     "properties": {
         "_sdc_conversations_id": {
-            "type": "string"
+            "type": ["string", "null"]
         },
         "id": {
             "type": "string"
@@ -14,10 +14,10 @@
             "type": "string"
         },
         "to": {
-            "type": "string"
+            "type": ["string", "null"]
         },
         "from": {
-            "type": "string"
+            "type": ["string", "null"]
         },
         "channelId": {
             "type": "string"
@@ -34,7 +34,7 @@
             }
         },
         "direction": {
-            "type": "string"
+            "type": ["string", "null"]
         },
         "status": {
             "type": "string"
