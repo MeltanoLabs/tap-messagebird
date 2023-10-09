@@ -33,7 +33,7 @@ class TapMessagebird(Tap):
             description=(
                 "The token to authenticate against the API service. "
                 "Test keys are not supported for Conversations see "
-                "https://support.messagebird.com/hc/en-us/articles/360000670709-What-is-the-difference-between-a-live-key-and-a-test-key-"  # noqa: E501
+                "https://support.messagebird.com/hc/en-us/articles/360000670709-What-is-the-difference-between-a-live-key-and-a-test-key-"
             ),
         ),
         th.Property(
