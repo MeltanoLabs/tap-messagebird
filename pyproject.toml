@@ -24,13 +24,8 @@ singer-sdk = { version="~=0.33.0", extras = ["testing"] }
 [tool.poetry.extras]
 s3 = ["fs-s3fs"]
 
-[tool.isort]
-profile = "black"
-multi_line_output = 3 # Vertical Hanging Indent
-src_paths = "tap_messagebird"
-
 [build-system]
-requires = ["poetry-core>=1.0.8", "poetry-dynamic-versioning"]
+requires = ["poetry-core==1.6", "poetry-dynamic-versioning==1.2"]
 build-backend = "poetry_dynamic_versioning.backend"
 
 [tool.poetry.scripts]
