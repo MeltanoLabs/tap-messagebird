@@ -101,7 +101,7 @@ class ConversationsStream(MessagebirdConversations):
                 # Record filtered out during post_process()
                 continue
             record_last_received_datetime: pendulum.DateTime = cast(
-                pendulum.DateTime,
+                "pendulum.DateTime",
                 pendulum.parse(record[self.replication_key]),
             )
             # Conversations are returned in descending order, so we can stop
